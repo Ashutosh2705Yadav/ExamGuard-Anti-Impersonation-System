@@ -4,6 +4,7 @@ import cors from "cors";
 import studentRoutes from "./routes/studentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
+import verifyRoutes from "./routes/verifyRoutes.js";
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,7 @@ app.use(express.json());
 // Student APIs
 app.use("/api/admin", adminRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/verify", verifyRoutes);
 app.use("/api/protected", protectedRoutes);
 
 
