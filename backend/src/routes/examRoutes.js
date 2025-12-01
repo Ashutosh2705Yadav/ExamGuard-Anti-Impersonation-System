@@ -42,6 +42,46 @@ router.get("/", async (req, res) => {
 });
 
 /* --------------------------------------------
+   ⭐ GET STUDENTS ASSIGNED TO EXAM
+   Route: /api/exams/:examId/students
+--------------------------------------------- */
+router.get("/:examId/students", async (req, res) => {
+  try {
+    const { examId } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT 
+        s.id AS student_id,
+        s.name,
+        s.email,
+        s.phone,
+        s.aadhaar,
+        se.status,
+        se.hall_ticket_qr
+      FROM student_exam se
+      JOIN students s ON s.id = se.student_id
+      WHERE se.exam_id = $1
+      ORDER BY s.id
+      `,
+      [examId]
+    );
+
+    return res.json({
+      success: true,
+      students: result.rows,
+    });
+  } catch (error) {
+    console.error("VIEW_STUDENTS_ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching assigned students",
+    });
+  }
+});
+
+
+/* --------------------------------------------
    ASSIGN STUDENTS + GENERATE HALLTICKET QR
 --------------------------------------------- */
 router.post("/:examId/assign", async (req, res) => {
@@ -147,7 +187,6 @@ router.get("/hallticket/:examId/:studentId", async (req, res) => {
 
 /* --------------------------------------------
    ALL HALLTICKETS FOR EXAM (HTML)
-   Correct Route: /api/exams/:examId/hallticket
 --------------------------------------------- */
 router.get("/:examId/hallticket", async (req, res) => {
   try {
