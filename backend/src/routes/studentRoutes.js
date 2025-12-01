@@ -9,4 +9,5 @@ router.post("/register", registerStudent);
 router.get("/", adminAuth, getAllStudents);
 router.get("/:id", adminAuth, getStudentById);
 
+
 export default router;

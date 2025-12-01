@@ -5,6 +5,9 @@ import studentRoutes from "./routes/studentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
 import verifyRoutes from "./routes/verifyRoutes.js";
+import logRoutes from "./routes/logRoutes.js";
+import statsRoutes from "./routes/statsRoutes.js";
+import examRoutes from "./routes/examRoutes.js";
 
 const app = express();
 app.use(cors());
@@ -17,6 +20,11 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/verify", verifyRoutes);
 app.use("/api/protected", protectedRoutes);
+app.use("/api/logs", logRoutes);
+app.use("/api/stats", statsRoutes);
+app.use("/api/exams", examRoutes);
+
+
 
 
 // Test route
