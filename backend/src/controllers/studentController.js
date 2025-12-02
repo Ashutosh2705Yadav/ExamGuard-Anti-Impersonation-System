@@ -20,6 +20,19 @@ export const registerStudent = async (req, res) => {
       return res.status(400).json({ success: false, message: "Fingerprint is required" });
     }
 
+    // Check duplicate Aadhaar
+    const existing = await pool.query(
+      "SELECT id FROM students WHERE aadhaar=$1",
+      [aadhaar]
+    );
+
+    if (existing.rowCount > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "A student with this Aadhaar already exists"
+      });
+    }
+
     // Hash fingerprint
     const fingerprint_hash = await bcrypt.hash(fingerprint, 10);
 

@@ -142,48 +142,48 @@ router.post("/:examId/assign", async (req, res) => {
 /* --------------------------------------------
    SINGLE STUDENT HALLTICKET (JSON)
 --------------------------------------------- */
-router.get("/hallticket/:examId/:studentId", async (req, res) => {
-  try {
-    const examId = Number(req.params.examId);
-    const studentId = Number(req.params.studentId);
+// router.get("/hallticket/:examId/:studentId", async (req, res) => {
+//   try {
+//     const examId = Number(req.params.examId);
+//     const studentId = Number(req.params.studentId);
 
-    const studentRes = await pool.query(
-      `SELECT id, name, email, phone, aadhaar FROM students WHERE id=$1`,
-      [studentId]
-    );
+//     const studentRes = await pool.query(
+//       `SELECT id, name, email, phone, aadhaar FROM students WHERE id=$1`,
+//       [studentId]
+//     );
 
-    if (studentRes.rowCount === 0)
-      return res.status(404).json({ success: false, message: "Student not found" });
+//     if (studentRes.rowCount === 0)
+//       return res.status(404).json({ success: false, message: "Student not found" });
 
-    const examRes = await pool.query(`SELECT * FROM exams WHERE id=$1`, [
-      examId,
-    ]);
+//     const examRes = await pool.query(`SELECT * FROM exams WHERE id=$1`, [
+//       examId,
+//     ]);
 
-    if (examRes.rowCount === 0)
-      return res.status(404).json({ success: false, message: "Exam not found" });
+//     if (examRes.rowCount === 0)
+//       return res.status(404).json({ success: false, message: "Exam not found" });
 
-    const hallRes = await pool.query(
-      `SELECT hall_ticket_qr FROM student_exam WHERE student_id=$1 AND exam_id=$2`,
-      [studentId, examId]
-    );
+//     const hallRes = await pool.query(
+//       `SELECT hall_ticket_qr FROM student_exam WHERE student_id=$1 AND exam_id=$2`,
+//       [studentId, examId]
+//     );
 
-    if (hallRes.rowCount === 0)
-      return res.status(404).json({
-        success: false,
-        message: "Hall ticket not generated",
-      });
+//     if (hallRes.rowCount === 0)
+//       return res.status(404).json({
+//         success: false,
+//         message: "Hall ticket not generated",
+//       });
 
-    res.json({
-      success: true,
-      student: studentRes.rows[0],
-      exam: examRes.rows[0],
-      hall_ticket_qr: hallRes.rows[0].hall_ticket_qr,
-    });
-  } catch (err) {
-    console.error("HALLTICKET_ERROR:", err);
-    res.status(500).json({ success: false, message: "Unable to fetch hallticket" });
-  }
-});
+//     res.json({
+//       success: true,
+//       student: studentRes.rows[0],
+//       exam: examRes.rows[0],
+//       hall_ticket_qr: hallRes.rows[0].hall_ticket_qr,
+//     });
+//   } catch (err) {
+//     console.error("HALLTICKET_ERROR:", err);
+//     res.status(500).json({ success: false, message: "Unable to fetch hallticket" });
+//   }
+// });
 
 /* --------------------------------------------
    ALL HALLTICKETS FOR EXAM (HTML)
@@ -242,6 +242,76 @@ router.get("/:examId/hallticket", async (req, res) => {
   } catch (err) {
     console.error("HALLTICKET_PAGE_ERROR:", err);
     res.status(500).send("Server error generating hallticket page");
+  }
+});
+/* --------------------------------------------
+   SINGLE STUDENT HALLTICKET (HTML PAGE)
+   Route: /api/exams/:examId/hallticket/student/:studentId
+--------------------------------------------- */
+router.get("/:examId/hallticket/student/:studentId", async (req, res) => {
+  try {
+    const examId = Number(req.params.examId);
+    const studentId = Number(req.params.studentId);
+
+    const studentRes = await pool.query(
+      `SELECT id, name, email, phone, aadhaar FROM students WHERE id=$1`,
+      [studentId]
+    );
+
+    const examRes = await pool.query(`SELECT * FROM exams WHERE id=$1`, [
+      examId,
+    ]);
+
+    const hallRes = await pool.query(
+      `SELECT hall_ticket_qr FROM student_exam WHERE student_id=$1 AND exam_id=$2`,
+      [studentId, examId]
+    );
+
+    if (
+      studentRes.rowCount === 0 ||
+      examRes.rowCount === 0 ||
+      hallRes.rowCount === 0
+    ) {
+      return res.status(404).send("Hallticket not found");
+    }
+
+    const s = studentRes.rows[0];
+    const e = examRes.rows[0];
+    const qr = hallRes.rows[0].hall_ticket_qr;
+
+    const html = `
+      <html>
+      <head>
+        <title>${s.name} - Hall Ticket</title>
+        <style>
+          body { font-family: Arial; padding: 20px; background: #f7f7f7; }
+          .card { background:white; padding:20px; border-radius:10px; border:1px solid #ccc; width:400px; margin:auto; }
+          img { width:200px; height:200px; border:1px solid #aaa; display:block; margin:auto; }
+          h2 { text-align:center; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h2>Hall Ticket</h2>
+          <p><b>Name:</b> ${s.name}</p>
+          <p><b>Email:</b> ${s.email}</p>
+          <p><b>Phone:</b> ${s.phone}</p>
+          <p><b>Aadhaar:</b> ${s.aadhaar}</p>
+          <hr/>
+          <p><b>Exam:</b> ${e.exam_name}</p>
+          <p><b>Date:</b> ${new Date(e.exam_date).toLocaleDateString()}</p>
+          <p><b>Time:</b> ${e.start_time} - ${e.end_time}</p>
+          <p><b>Center:</b> ${e.center}</p>
+          <img src="${qr}" />
+        </div>
+      </body>
+      </html>
+    `;
+
+    res.send(html);
+  } catch (err) {
+    console.error("HTML_HALLTICKET_ERROR:", err);
+    res.status(500).send("Unable to load hallticket page");
   }
 });
 

@@ -35,7 +35,7 @@ export default function AssignedStudents() {
           <div className="text-gray-500">No students assigned yet.</div>
         ) : (
           students.map((s) => (
-            
+
             <div
               key={s.id}
               className="p-4 border rounded flex justify-between items-center"
@@ -51,10 +51,10 @@ export default function AssignedStudents() {
                   Status:{" "}
                   <span
                     className={`px-2 py-1 rounded text-white text-xs ${s.status === "VERIFIED"
-                        ? "bg-green-600"
-                        : s.status === "IMPERSONATION"
-                          ? "bg-red-600"
-                          : "bg-gray-400"
+                      ? "bg-green-600"
+                      : s.status === "IMPERSONATION"
+                        ? "bg-red-600"
+                        : "bg-gray-400"
                       }`}
                   >
                     {s.status || "PENDING"}
@@ -65,7 +65,7 @@ export default function AssignedStudents() {
               <div className="flex items-center gap-3">
                 {/* View Hallticket */}
                 <a
-                  href={`http://localhost:5001/api/exams/${examId}/hallticket`}
+                  href={`http://localhost:5001/api/exams/${examId}/hallticket/student/${s.student_id || s.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
