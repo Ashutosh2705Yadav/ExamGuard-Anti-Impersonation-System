@@ -1,56 +1,73 @@
-import pool from "../config/db.js";
 import bcrypt from "bcryptjs";
+import pool from "../config/db.js";
+
+/*
+    FINAL IDENTITY VERIFICATION CONTROLLER
+    --------------------------------------
+    ✔ Compares fingerprint
+    ✔ Updates student_exam.status
+    ✔ Inserts log into auth_logs
+*/
 
 export const verifyStudent = async (req, res) => {
   try {
-    const { studentId, fingerprint } = req.body;
-    
+    const { studentId, examId, fingerprint } = req.body;
 
-    if (!studentId || !fingerprint) {
-      return res.status(400).json({ success: false, message: "Missing fields" });
+    // Validate inputs
+    if (!studentId || !examId || !fingerprint) {
+      return res.status(400).json({
+        success: false,
+        message: "studentId, examId, and fingerprint are required",
+      });
     }
 
-    // Fetch stored fingerprint hash
-    const result = await pool.query(
-      "SELECT fingerprint_hash FROM students WHERE id = $1",
+    // Fetch student
+    const studentRes = await pool.query(
+      `SELECT id, name, fingerprint_hash FROM students WHERE id=$1`,
       [studentId]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: "Student not found" });
+    if (studentRes.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
     }
 
-    const storedHash = result.rows[0].fingerprint_hash;
-    
-    // Compare fingerprints
-   
-    const isMatch = await bcrypt.compare(fingerprint, storedHash);
-    
-    // Insert log into auth_logs
-    const logStatus = isMatch ? "VERIFIED" : "IMPERSONATION";
-   
+    const student = studentRes.rows[0];
 
+    // Compare fingerprint with hash
+    const isMatch = await bcrypt.compare(fingerprint, student.fingerprint_hash);
+    const status = isMatch ? "VERIFIED" : "IMPERSONATION";
+
+    // Update student_exam entry
     await pool.query(
-      "INSERT INTO auth_logs (student_id, status) VALUES ($1, $2)",
-      [studentId, logStatus]
+      `UPDATE student_exam 
+       SET status=$1
+       WHERE student_id=$2 AND exam_id=$3`,
+      [status, studentId, examId]
     );
 
-    if (isMatch) {
-      return res.json({
-        success: true,
-        message: "Identity verified",
-        status: "VERIFIED"
-      });
-    } else {
-      return res.json({
-        success: false,
-        message: "Fingerprint mismatch",
-        status: "IMPERSONATION"
-      });
-    }
+    // Insert log in auth_logs
+    await pool.query(
+      `INSERT INTO auth_logs (student_id, exam_id, status)
+       VALUES ($1, $2, $3)`,
+      [studentId, examId, status]
+    );
 
+    // Send final response
+    return res.json({
+      success: true,
+      status,
+      message: isMatch
+        ? "Fingerprint matched. Entry verified."
+        : "Fingerprint mismatch! Impersonation detected.",
+    });
   } catch (error) {
-    console.error("Verification Error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("VERIFY_ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error verifying identity",
+    });
   }
 };

@@ -24,7 +24,7 @@ export default function AssignedStudents() {
       <h1 className="text-2xl font-bold mb-4">Assigned Students</h1>
 
       <Link
-        to="/admin/exams"
+        to="/exams"
         className="px-3 py-1 bg-gray-200 rounded text-sm mb-4 inline-block"
       >
         ← Back to Exams

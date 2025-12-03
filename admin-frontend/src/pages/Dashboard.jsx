@@ -54,7 +54,9 @@ export default function Dashboard() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
-        <div className="flex gap-3">
+        
+
+  <div className="flex gap-3">
 
   {/* EXAMS BUTTON */}
   <a
@@ -62,6 +64,14 @@ export default function Dashboard() {
     className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
   >
     Exams
+  </a>
+
+  {/* VERIFY IDENTITY BUTTON */}
+  <a
+    href="/verify"
+    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+  >
+    Verify Identity
   </a>
 
   {/* ADD STUDENT BUTTON */}

@@ -6,6 +6,7 @@ import Exams from "./pages/Exams.jsx";
 import AssignedStudents from "./pages/AssignedStudents";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Verify from "./pages/Verify";
 
 export default function App() {
   const { token } = useContext(AuthContext);
@@ -15,6 +16,7 @@ export default function App() {
       <Routes>
         <Route path="/admin/exams/:examId/students" element={<AssignedStudents />} />
         <Route path="/exams" element={token ? <Exams /> : <Navigate to="/login" />} />
+        <Route path="/verify" element={<Verify />} />
 
         {/* Public Route */}
         <Route path="/login" element={<Login />} />
