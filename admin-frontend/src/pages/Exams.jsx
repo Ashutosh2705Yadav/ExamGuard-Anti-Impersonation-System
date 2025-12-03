@@ -9,16 +9,20 @@ export default function Exams() {
   const [exams, setExams] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
 
-  // NEW STATES (correct location — inside component)
   const [selectedExam, setSelectedExam] = useState(null);
   const [openAssign, setOpenAssign] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+
   const fetchExams = async () => {
     try {
+      setLoading(true);
       const res = await API.get("/exams");
       setExams(res.data.exams || []);
     } catch (err) {
       console.error("fetchExams error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -28,70 +32,106 @@ export default function Exams() {
 
   return (
     <div className="p-6">
+
+      {/* BACK TO DASHBOARD */}
+      <div className="mb-4">
+        <a
+          href="/"
+          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition"
+        >
+          ← Back to Dashboard
+        </a>
+      </div>
+
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Exams</h1>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setOpenCreate(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Create Exam
-          </button>
-        </div>
+
+        <button
+          onClick={() => setOpenCreate(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
+        >
+          Create Exam
+        </button>
       </div>
 
-      <div className="space-y-4">
-        {exams.length === 0 && (
-          <div className="text-sm text-gray-500">No exams yet — create one.</div>
-        )}
+      {/* LOADING SKELETON */}
+      {loading && (
+        <div className="space-y-4 animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 bg-gray-200 rounded-lg shadow"></div>
+          ))}
+        </div>
+      )}
 
-        {exams.map((e) => (
-          <div
-            key={e.id}
-            className="p-4 border rounded flex justify-between items-center"
-          >
-            <div>
-              <div className="font-semibold">{e.exam_name}</div>
-              <div className="text-sm text-gray-600">
-                {e.exam_date} • {e.start_time} - {e.end_time} • {e.center}
+      {/* EMPTY STATE */}
+      {!loading && exams.length === 0 && (
+        <div className="text-sm text-gray-500">No exams yet — create one.</div>
+      )}
+
+      {/* EXAM LIST */}
+      {!loading && exams.length > 0 && (
+        <div className="space-y-4">
+          {exams.map((e) => (
+            <div
+              key={e.id}
+              className="p-5 border rounded-lg shadow hover:shadow-md transition bg-white"
+            >
+              <div className="flex justify-between items-center">
+
+                {/* LEFT INFO */}
+                <div>
+                  <div className="text-xl font-semibold text-gray-800">
+                    {e.exam_name}
+                  </div>
+
+                  <div className="text-sm text-gray-600 mt-1">
+                    {new Date(e.exam_date).toLocaleDateString()} •{" "}
+                    {e.start_time.slice(0, 5)} - {e.end_time.slice(0, 5)} •{" "}
+                    {e.center}
+                  </div>
+                </div>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex gap-3">
+
+                  {/* Assign Students */}
+                  <button
+                    onClick={() => {
+                      setSelectedExam(e);
+                      setOpenAssign(true);
+                    }}
+                    className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                  >
+                    Assign Students
+                  </button>
+
+                  {/* View Assigned Students */}
+                  <Link
+                    to={`/admin/exams/${e.id}/students`}
+                    className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700"
+                  >
+                    View Students
+                  </Link>
+
+                  {/* Halltickets */}
+                  <a
+                    href={`http://localhost:5001/api/exams/${e.id}/hallticket`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
+                  >
+                    Halltickets
+                  </a>
+
+                </div>
               </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            <div className="flex items-center gap-3">
-
-              {/* Assign Students */}
-              <button
-                onClick={() => {
-                  setSelectedExam(e);
-                  setOpenAssign(true);
-                }}
-                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
-              >
-                Assign Students
-              </button>
-              {/* View Assigned Students */}
-              <Link
-                to={`/admin/exams/${e.id}/students`}
-                className="px-3 py-1 bg-purple-600 text-white rounded text-sm"
-              >
-                View Students
-              </Link>
-
-              {/* View Halltickets */}
-              <a
-                className="px-3 py-1 bg-gray-100 rounded text-sm"
-                href={`http://localhost:5001/api/exams/${e.id}/hallticket`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Halltickets
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Create Exam Modal */}
+      {/* CREATE EXAM MODAL */}
       <CreateExamModal
         isOpen={openCreate}
         onClose={() => {
@@ -100,7 +140,7 @@ export default function Exams() {
         }}
       />
 
-      {/* Assign Students Modal */}
+      {/* ASSIGN STUDENTS MODAL */}
       <AssignStudentsModal
         isOpen={openAssign}
         exam={selectedExam}
