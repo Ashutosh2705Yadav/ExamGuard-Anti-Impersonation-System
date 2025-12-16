@@ -1,15 +1,13 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5001/api",
 });
 
-// Attach token automatically for every request
+// Attach admin token for every request
 API.interceptors.request.use(
   (config) => {
-    // Accept both keys (backward-compatible)
-    const token =
-      localStorage.getItem("adminToken") || localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
 
     if (token) {
       config.headers = config.headers || {};
@@ -18,8 +16,18 @@ API.interceptors.request.use(
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
+  (error) => Promise.reject(error)
+);
+
+// Auto logout on token expiry / invalid token
+API.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/";
+    }
+    return Promise.reject(err);
   }
 );
 
