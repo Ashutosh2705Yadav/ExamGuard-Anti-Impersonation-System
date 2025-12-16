@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { Html5QrcodeScanner } from "html5-qrcode";
 
 export default function Verify() {
+  const navigate = useNavigate();
+
   const [scanResult, setScanResult] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +22,7 @@ export default function Verify() {
         scanner.clear();
         handleScan(qrText);
       },
-      () => { }
+      () => {}
     );
   };
 
@@ -50,7 +53,7 @@ export default function Verify() {
       const res = await API.post("/verify", {
         studentId: scanResult.student.id,
         examId: scanResult.exam.id,
-        fingerprint: "my_fingerprint", // static for now
+        fingerprint: "my_fingerprint",
       });
 
       setMessage(res.data.message);
@@ -67,32 +70,24 @@ export default function Verify() {
 
   return (
     <div className="p-6 flex justify-center">
-      {/* ABSOLUTE TOP-LEFT BACK BUTTON */}
-      {/* BACK TO DASHBOARD */}
-      <a
-        href="/"
+      {/* BACK TO DASHBOARD (SPA SAFE) */}
+      <button
+        onClick={() => navigate("/")}
         className="fixed top-4 left-4 inline-flex items-center gap-2 px-4 py-2 
-             bg-white border border-gray-300 rounded-lg shadow hover:bg-gray-100
-             transition z-50"
+                   bg-white border border-gray-300 rounded-lg shadow 
+                   hover:bg-gray-100 transition z-50"
       >
         <span className="text-lg">←</span> Dashboard
-      </a>
+      </button>
+
       <div className="w-full max-w-2xl">
-
-
-
-
-
         <h1 className="text-3xl font-bold mb-6 text-center">
           Verify Student Identity
         </h1>
 
-        {/* ------------------------------ */}
-        {/* SCANNER SECTION */}
-        {/* ------------------------------ */}
+        {/* SCANNER */}
         {!scanResult && (
           <div className="bg-white/60 backdrop-blur shadow-lg rounded-xl p-6 border border-gray-200 text-center">
-
             <button
               onClick={startScanner}
               className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
@@ -108,12 +103,9 @@ export default function Verify() {
           </div>
         )}
 
-        {/* ------------------------------ */}
-        {/* RESULT SECTION */}
-        {/* ------------------------------ */}
+        {/* RESULT */}
         {scanResult && (
-          <div className="mt-6 bg-white/70 backdrop-blur shadow-xl rounded-xl p-6 border border-gray-200 animate-fade">
-
+          <div className="mt-6 bg-white/70 backdrop-blur shadow-xl rounded-xl p-6 border border-gray-200">
             <h2 className="text-xl font-semibold mb-3 border-b pb-2">
               Student Details
             </h2>
@@ -155,10 +147,11 @@ export default function Verify() {
 
             {message && (
               <p
-                className={`mt-5 text-center text-lg font-bold ${message.includes("matched")
-                  ? "text-green-600"
-                  : "text-red-600"
-                  }`}
+                className={`mt-5 text-center text-lg font-bold ${
+                  message.includes("matched")
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
               >
                 {message}
               </p>

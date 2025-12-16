@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import API from "../services/api";
 
+// ✅ backend base URL (Render-safe)
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
 export default function AssignedStudents() {
   const { examId } = useParams();
   const [students, setStudents] = useState([]);
@@ -24,6 +27,7 @@ export default function AssignedStudents() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Assigned Students</h1>
 
+      {/* ✅ SPA-safe navigation */}
       <Link
         to="/exams"
         className="px-3 py-1 bg-gray-200 rounded text-sm mb-4 inline-block"
@@ -31,6 +35,7 @@ export default function AssignedStudents() {
         ← Back to Exams
       </Link>
 
+      {/* SEARCH */}
       <input
         type="text"
         placeholder="Search by name, email or Aadhaar"
@@ -53,37 +58,36 @@ export default function AssignedStudents() {
               );
             })
             .map((s) => (
-
-            <div
-              key={s.id}
-              className="p-4 border rounded flex justify-between items-center"
-            >
-              <div>
-                <div className="font-semibold">
-                  {s.name} • {s.email}
-                </div>
-                <div className="text-sm text-gray-600">
-                  Aadhaar: {s.aadhaar}
-                </div>
-                <div className="text-sm">
-                  Status:{" "}
-                  <span
-                    className={`px-2 py-1 rounded text-white text-xs ${s.status === "VERIFIED"
-                      ? "bg-green-600"
-                      : s.status === "IMPERSONATION"
-                        ? "bg-red-600"
-                        : "bg-gray-400"
+              <div
+                key={s.id}
+                className="p-4 border rounded flex justify-between items-center"
+              >
+                <div>
+                  <div className="font-semibold">
+                    {s.name} • {s.email}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Aadhaar: {s.aadhaar}
+                  </div>
+                  <div className="text-sm">
+                    Status:{" "}
+                    <span
+                      className={`px-2 py-1 rounded text-white text-xs ${
+                        s.status === "VERIFIED"
+                          ? "bg-green-600"
+                          : s.status === "IMPERSONATION"
+                          ? "bg-red-600"
+                          : "bg-gray-400"
                       }`}
-                  >
-                    {s.status || "PENDING"}
-                  </span>
+                    >
+                      {s.status || "PENDING"}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-3">
-                {/* View Hallticket */}
+                {/* ✅ External backend link (Render-safe) */}
                 <a
-                  href={`http://localhost:5001/api/exams/${examId}/hallticket/student/${s.student_id || s.id}`}
+                  href={`${BACKEND_URL}/api/exams/${examId}/hallticket/student/${s.student_id || s.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
@@ -91,8 +95,7 @@ export default function AssignedStudents() {
                   View Hallticket
                 </a>
               </div>
-            </div>
-          ))
+            ))
         )}
       </div>
     </div>

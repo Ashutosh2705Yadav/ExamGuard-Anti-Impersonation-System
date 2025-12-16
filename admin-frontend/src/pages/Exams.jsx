@@ -1,6 +1,6 @@
 // admin-frontend/src/pages/Exams.jsx
-import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import API from "../services/api";
 import CreateExamModal from "../components/CreateExamModal.jsx";
 import AssignStudentsModal from "../components/AssignStudentsModal.jsx";
@@ -33,17 +33,17 @@ export default function Exams() {
   return (
     <div className="p-6">
 
-      {/* BACK TO DASHBOARD */}
+      {/* ================= BACK TO DASHBOARD ================= */}
       <div className="mb-4">
-        <a
-          href="/"
-          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition"
+        <Link
+          to="/"
+          className="inline-block px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition"
         >
           ← Back to Dashboard
-        </a>
+        </Link>
       </div>
 
-      {/* HEADER */}
+      {/* ================= HEADER ================= */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Exams</h1>
 
@@ -55,21 +55,26 @@ export default function Exams() {
         </button>
       </div>
 
-      {/* LOADING SKELETON */}
+      {/* ================= LOADING ================= */}
       {loading && (
         <div className="space-y-4 animate-pulse">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-gray-200 rounded-lg shadow"></div>
+            <div
+              key={i}
+              className="h-20 bg-gray-200 rounded-lg shadow"
+            ></div>
           ))}
         </div>
       )}
 
-      {/* EMPTY STATE */}
+      {/* ================= EMPTY STATE ================= */}
       {!loading && exams.length === 0 && (
-        <div className="text-sm text-gray-500">No exams yet — create one.</div>
+        <div className="text-sm text-gray-500">
+          No exams yet — create one.
+        </div>
       )}
 
-      {/* EXAM LIST */}
+      {/* ================= EXAM LIST ================= */}
       {!loading && exams.length > 0 && (
         <div className="space-y-4">
           {exams.map((e) => (
@@ -116,7 +121,7 @@ export default function Exams() {
 
                   {/* Halltickets */}
                   <a
-                    href={`http://localhost:5001/api/exams/${e.id}/hallticket`}
+                    href={`${API.defaults.baseURL}/exams/${e.id}/hallticket`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
@@ -131,7 +136,7 @@ export default function Exams() {
         </div>
       )}
 
-      {/* CREATE EXAM MODAL */}
+      {/* ================= MODALS ================= */}
       <CreateExamModal
         isOpen={openCreate}
         onClose={() => {
@@ -140,7 +145,6 @@ export default function Exams() {
         }}
       />
 
-      {/* ASSIGN STUDENTS MODAL */}
       <AssignStudentsModal
         isOpen={openAssign}
         exam={selectedExam}
