@@ -24,7 +24,10 @@ app.use("/api/logs", logRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/exams", examRoutes);
 
-
+app.use(cors({
+  origin: "*", // later you can restrict
+  credentials: true
+}));
 
 
 // Test route

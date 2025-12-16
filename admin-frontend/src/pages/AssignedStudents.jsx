@@ -5,6 +5,7 @@ import API from "../services/api";
 export default function AssignedStudents() {
   const { examId } = useParams();
   const [students, setStudents] = useState([]);
+  const [search, setSearch] = useState("");
 
   const fetchAssigned = async () => {
     try {
@@ -30,11 +31,28 @@ export default function AssignedStudents() {
         ← Back to Exams
       </Link>
 
+      <input
+        type="text"
+        placeholder="Search by name, email or Aadhaar"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full md:w-1/3 px-3 py-2 border rounded mb-4"
+      />
+
       <div className="space-y-4 mt-4">
         {students.length === 0 ? (
           <div className="text-gray-500">No students assigned yet.</div>
         ) : (
-          students.map((s) => (
+          students
+            .filter((s) => {
+              const q = search.toLowerCase();
+              return (
+                s.name?.toLowerCase().includes(q) ||
+                s.email?.toLowerCase().includes(q) ||
+                s.aadhaar?.includes(q)
+              );
+            })
+            .map((s) => (
 
             <div
               key={s.id}

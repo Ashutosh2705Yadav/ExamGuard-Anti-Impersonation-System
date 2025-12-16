@@ -1,4 +1,3 @@
-// admin-frontend/src/components/AssignStudentsModal.jsx
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
 
@@ -6,6 +5,9 @@ export default function AssignStudentsModal({ isOpen, onClose, exam }) {
   const [students, setStudents] = useState([]);
   const [selected, setSelected] = useState(new Set());
   const [loading, setLoading] = useState(false);
+
+  const allSelected =
+    students.length > 0 && selected.size === students.length;
 
   // Fetch list of students when modal opens
   useEffect(() => {
@@ -74,6 +76,22 @@ export default function AssignStudentsModal({ isOpen, onClose, exam }) {
           >
             Close
           </button>
+        </div>
+
+        {/* Select All */}
+        <div className="flex items-center gap-2 mb-4">
+          <input
+            type="checkbox"
+            checked={allSelected}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelected(new Set(students.map(s => s.id)));
+              } else {
+                setSelected(new Set());
+              }
+            }}
+          />
+          <span className="font-medium">Select All Students</span>
         </div>
 
         {/* Students List */}
