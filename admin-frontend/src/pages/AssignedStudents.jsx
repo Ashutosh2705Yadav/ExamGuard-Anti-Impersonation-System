@@ -87,7 +87,7 @@ export default function AssignedStudents() {
 
                 {/* ✅ External backend link (Render-safe) */}
                 <a
-                  href={`${BACKEND_URL}/api/exams/${examId}/hallticket/student/${s.student_id || s.id}`}
+                  href={`${BACKEND_URL}/exams/${examId}/hallticket/student/${s.student_id || s.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
