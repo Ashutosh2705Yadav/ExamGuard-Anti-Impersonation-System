@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import API from "../services/api";
 
 // ✅ backend base URL (Render-safe)
-const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export default function AssignedStudents() {
   const { examId } = useParams();
