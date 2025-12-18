@@ -8,10 +8,8 @@ import AssignStudentsModal from "../components/AssignStudentsModal.jsx";
 export default function Exams() {
   const [exams, setExams] = useState([]);
   const [openCreate, setOpenCreate] = useState(false);
-
   const [selectedExam, setSelectedExam] = useState(null);
   const [openAssign, setOpenAssign] = useState(false);
-
   const [loading, setLoading] = useState(true);
 
   const fetchExams = async () => {
@@ -31,27 +29,28 @@ export default function Exams() {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
 
-      {/* ================= BACK TO DASHBOARD ================= */}
-      <div className="mb-4">
-        <Link
-          to="/"
-          className="inline-block px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition"
-        >
-          ← Back to Dashboard
-        </Link>
-      </div>
-
-      {/* ================= HEADER ================= */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Exams</h1>
+      {/* ================= TOP BAR ================= */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-2"
+          >
+            ← Back to Dashboard
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-800">Exams</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Create exams and manage assigned students
+          </p>
+        </div>
 
         <button
           onClick={() => setOpenCreate(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
+          className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
         >
-          Create Exam
+          + Create Exam
         </button>
       </div>
 
@@ -61,70 +60,66 @@ export default function Exams() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-20 bg-gray-200 rounded-lg shadow"
-            ></div>
+              className="h-24 bg-gray-200 rounded-xl"
+            />
           ))}
         </div>
       )}
 
       {/* ================= EMPTY STATE ================= */}
       {!loading && exams.length === 0 && (
-        <div className="text-sm text-gray-500">
-          No exams yet — create one.
+        <div className="bg-white rounded-xl shadow p-8 text-center text-gray-500">
+          No exams created yet. Click <b>Create Exam</b> to get started.
         </div>
       )}
 
-      {/* ================= EXAM LIST ================= */}
+      {/* ================= EXAMS LIST ================= */}
       {!loading && exams.length > 0 && (
         <div className="space-y-4">
           {exams.map((e) => (
             <div
               key={e.id}
-              className="p-5 border rounded-lg shadow hover:shadow-md transition bg-white"
+              className="bg-white rounded-xl shadow p-5 hover:shadow-md transition"
             >
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
                 {/* LEFT INFO */}
                 <div>
-                  <div className="text-xl font-semibold text-gray-800">
+                  <h2 className="text-xl font-semibold text-gray-800">
                     {e.exam_name}
-                  </div>
-
-                  <div className="text-sm text-gray-600 mt-1">
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
                     {new Date(e.exam_date).toLocaleDateString()} •{" "}
-                    {e.start_time.slice(0, 5)} - {e.end_time.slice(0, 5)} •{" "}
+                    {e.start_time.slice(0, 5)} – {e.end_time.slice(0, 5)} •{" "}
                     {e.center}
-                  </div>
+                  </p>
                 </div>
 
-                {/* ACTION BUTTONS */}
-                <div className="flex gap-3">
+                {/* ACTIONS */}
+                <div className="flex flex-wrap gap-2">
 
-                  {/* Assign Students */}
                   <button
                     onClick={() => {
                       setSelectedExam(e);
                       setOpenAssign(true);
                     }}
-                    className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                    className="px-3 py-1.5 bg-emerald-600 text-white rounded-md text-sm hover:bg-emerald-700 transition"
                   >
                     Assign Students
                   </button>
 
-                  {/* View Assigned Students */}
                   <Link
                     to={`/admin/exams/${e.id}/students`}
-                    className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700"
+                    className="px-3 py-1.5 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 transition"
                   >
                     View Students
                   </Link>
 
-                  {/* Halltickets */}
                   <a
                     href={`${API.defaults.baseURL}/exams/${e.id}/hallticket`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
+                    className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 transition"
                   >
                     Halltickets
                   </a>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { Html5QrcodeScanner } from "html5-qrcode";
@@ -6,37 +6,85 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 export default function Verify() {
   const navigate = useNavigate();
 
+  const scannerRef = useRef(null);
   const [scanResult, setScanResult] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
 
-  // Start QR Scanner
+  // 🔐 Check camera permission explicitly
+  const checkCameraPermission = async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: true });
+      setCameraReady(true);
+    } catch (err) {
+      console.error("Camera permission error:", err);
+      setMessage(
+        "Camera access denied. Please allow camera permission and reload."
+      );
+      setCameraReady(false);
+    }
+  };
+
+  useEffect(() => {
+    checkCameraPermission();
+
+    return () => {
+      // 🧹 cleanup scanner on unmount
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(() => {});
+      }
+    };
+  }, []);
+
+  // ▶ Start QR Scanner (safe)
   const startScanner = () => {
-    const scanner = new Html5QrcodeScanner("qr-reader", {
-      fps: 10,
-      qrbox: 250,
-    });
+    if (!cameraReady) {
+      setMessage("Camera not available.");
+      return;
+    }
+
+    // prevent multiple scanners
+    if (scannerRef.current) return;
+
+    const scanner = new Html5QrcodeScanner(
+      "qr-reader",
+      {
+        fps: 10,
+        qrbox: 250,
+        rememberLastUsedCamera: true,
+      },
+      false
+    );
+
+    scannerRef.current = scanner;
 
     scanner.render(
       async (qrText) => {
-        scanner.clear();
-        handleScan(qrText);
+        try {
+          await scanner.clear();
+          scannerRef.current = null;
+          handleScan(qrText);
+        } catch {}
       },
       () => {}
     );
   };
 
-  // Handle QR Scan
+  // 📡 Handle QR scan
   const handleScan = async (qrText) => {
     try {
       setLoading(true);
-      const res = await API.post("/verify/scan", { qrPayload: qrText });
+      setMessage("");
+
+      const res = await API.post("/verify/scan", {
+        qrPayload: qrText,
+      });
 
       if (res.data.success) {
         setScanResult(res.data);
-        setMessage("");
       } else {
-        setMessage("Invalid QR");
+        setMessage("Invalid QR Code");
       }
     } catch (err) {
       setMessage("Invalid or unreadable QR");
@@ -45,7 +93,7 @@ export default function Verify() {
     }
   };
 
-  // Verify Fingerprint
+  // 🧬 Verify fingerprint
   const verifyFingerprint = async () => {
     try {
       setLoading(true);
@@ -58,11 +106,7 @@ export default function Verify() {
 
       setMessage(res.data.message);
     } catch (err) {
-      if (err.response?.status === 401) {
-        setMessage("Authentication error. Please login again.");
-      } else {
-        setMessage("Verification failed");
-      }
+      setMessage("Verification failed");
     } finally {
       setLoading(false);
     }
@@ -70,14 +114,12 @@ export default function Verify() {
 
   return (
     <div className="p-6 flex justify-center">
-      {/* BACK TO DASHBOARD (SPA SAFE) */}
+      {/* BACK */}
       <button
         onClick={() => navigate("/")}
-        className="fixed top-4 left-4 inline-flex items-center gap-2 px-4 py-2 
-                   bg-white border border-gray-300 rounded-lg shadow 
-                   hover:bg-gray-100 transition z-50"
+        className="fixed top-4 left-4 px-4 py-2 bg-white border rounded-lg shadow hover:bg-gray-100 z-50"
       >
-        <span className="text-lg">←</span> Dashboard
+        ← Dashboard
       </button>
 
       <div className="w-full max-w-2xl">
@@ -87,10 +129,15 @@ export default function Verify() {
 
         {/* SCANNER */}
         {!scanResult && (
-          <div className="bg-white/60 backdrop-blur shadow-lg rounded-xl p-6 border border-gray-200 text-center">
+          <div className="bg-white shadow-lg rounded-xl p-6 border text-center">
             <button
               onClick={startScanner}
-              className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+              disabled={!cameraReady}
+              className={`px-5 py-2 rounded-lg shadow transition ${
+                cameraReady
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-400 text-white cursor-not-allowed"
+              }`}
             >
               Start QR Scanner
             </button>
@@ -105,49 +152,37 @@ export default function Verify() {
 
         {/* RESULT */}
         {scanResult && (
-          <div className="mt-6 bg-white/70 backdrop-blur shadow-xl rounded-xl p-6 border border-gray-200">
-            <h2 className="text-xl font-semibold mb-3 border-b pb-2">
-              Student Details
-            </h2>
+          <div className="mt-6 bg-white shadow-xl rounded-xl p-6 border">
+            <h2 className="text-xl font-semibold mb-3">Student Details</h2>
 
-            <div className="space-y-1 text-gray-700">
-              <p><b>Name:</b> {scanResult.student.name}</p>
-              <p><b>Email:</b> {scanResult.student.email}</p>
-              <p><b>Aadhaar:</b> {scanResult.student.aadhaar}</p>
-            </div>
+            <p><b>Name:</b> {scanResult.student.name}</p>
+            <p><b>Email:</b> {scanResult.student.email}</p>
+            <p><b>Aadhaar:</b> {scanResult.student.aadhaar}</p>
 
-            <h2 className="text-xl font-semibold mt-6 mb-3 border-b pb-2">
-              Exam Details
-            </h2>
+            <h2 className="text-xl font-semibold mt-4">Exam Details</h2>
+            <p><b>Exam:</b> {scanResult.exam.exam_name}</p>
+            <p><b>Center:</b> {scanResult.exam.center}</p>
 
-            <div className="space-y-1 text-gray-700">
-              <p><b>Exam:</b> {scanResult.exam.exam_name}</p>
-              <p><b>Center:</b> {scanResult.exam.center}</p>
-            </div>
-
-            <h2 className="text-xl font-semibold mt-6 mb-3 border-b pb-2">
-              Hall Ticket QR
-            </h2>
-
-            <div className="flex justify-center">
+            <h2 className="text-xl font-semibold mt-4">Hall Ticket QR</h2>
+            <div className="flex justify-center mt-2">
               <img
                 src={scanResult.hallticket}
-                className="w-48 border rounded shadow"
-                alt="QR Code"
+                className="w-48 border rounded"
+                alt="QR"
               />
             </div>
 
             <button
               onClick={verifyFingerprint}
               disabled={loading}
-              className="mt-6 w-full py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition"
+              className="mt-6 w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Verify Fingerprint
             </button>
 
             {message && (
               <p
-                className={`mt-5 text-center text-lg font-bold ${
+                className={`mt-4 text-center text-lg font-bold ${
                   message.includes("matched")
                     ? "text-green-600"
                     : "text-red-600"

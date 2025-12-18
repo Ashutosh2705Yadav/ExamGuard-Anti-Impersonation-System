@@ -14,17 +14,13 @@ export default function Dashboard() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // modal state
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
-  // add student modal
   const [openAddModal, setOpenAddModal] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-
       const [statsRes, studentsRes, logsRes] = await Promise.all([
         API.get("/stats"),
         API.get("/students"),
@@ -35,7 +31,7 @@ export default function Dashboard() {
       setStudents(studentsRes.data.students);
       setLogs(logsRes.data.logs);
     } catch (err) {
-      console.error("Error loading dashboard:", err);
+      console.error("Dashboard load error:", err);
     } finally {
       setLoading(false);
     }
@@ -45,48 +41,43 @@ export default function Dashboard() {
     fetchDashboardData();
   }, []);
 
-  const handleSelectStudent = (student) => {
-    setSelectedStudent(student);
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedStudent(null);
-  };
-
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
 
       {/* ================= HEADER ================= */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Overview of students, exams & verifications
+          </p>
+        </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Link
             to="/exams"
-            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
           >
             Exams
           </Link>
 
           <Link
             to="/verify"
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-700 transition"
           >
             Verify Identity
           </Link>
 
           <button
             onClick={() => setOpenAddModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
           >
             Add Student
           </button>
 
           <button
             onClick={logout}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
           >
             Logout
           </button>
@@ -96,15 +87,15 @@ export default function Dashboard() {
       {/* ================= LOADING ================= */}
       {loading && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10 animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10 animate-pulse">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              <div key={i} className="h-28 bg-gray-200 rounded-xl"></div>
             ))}
           </div>
 
-          <div className="space-y-3 mb-10 animate-pulse">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-12 bg-gray-200 rounded"></div>
+          <div className="space-y-4 animate-pulse">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-14 bg-gray-200 rounded-lg"></div>
             ))}
           </div>
         </>
@@ -112,73 +103,95 @@ export default function Dashboard() {
 
       {/* ================= STATS ================= */}
       {!loading && stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-          <div className="bg-blue-500 text-white p-4 rounded shadow">
-            <h2 className="text-xl">Total Students</h2>
-            <p className="text-3xl font-bold">{stats.totalStudents}</p>
-          </div>
-
-          <div className="bg-green-500 text-white p-4 rounded shadow">
-            <h2 className="text-xl">Total Verifications</h2>
-            <p className="text-3xl font-bold">{stats.totalLogs}</p>
-          </div>
-
-          <div className="bg-purple-500 text-white p-4 rounded shadow">
-            <h2 className="text-xl">Verified</h2>
-            <p className="text-3xl font-bold">{stats.totalVerified}</p>
-          </div>
-
-          <div className="bg-red-500 text-white p-4 rounded shadow">
-            <h2 className="text-xl">Impersonations</h2>
-            <p className="text-3xl font-bold">
-              {stats.totalImpersonation}
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10">
+          <StatCard
+            title="Total Students"
+            value={stats.totalStudents}
+            color="bg-blue-600"
+          />
+          <StatCard
+            title="Total Verifications"
+            value={stats.totalLogs}
+            color="bg-emerald-600"
+          />
+          <StatCard
+            title="Verified"
+            value={stats.totalVerified}
+            color="bg-purple-600"
+          />
+          <StatCard
+            title="Impersonations"
+            value={stats.totalImpersonation}
+            color="bg-red-600"
+          />
         </div>
       )}
 
       {/* ================= STUDENTS ================= */}
       {!loading && (
-        <>
-          <h2 className="text-2xl font-bold mb-4">Registered Students</h2>
-          <div className="mb-10">
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            Registered Students
+          </h2>
+          <div className="bg-white rounded-xl shadow p-4">
             <StudentsPanel
               students={students}
-              onSelectStudent={handleSelectStudent}
+              onSelectStudent={(s) => {
+                setSelectedStudent(s);
+                setModalOpen(true);
+              }}
             />
           </div>
-        </>
+        </section>
       )}
 
       {/* ================= LOGS ================= */}
       {!loading && (
-        <>
-          <h2 className="text-2xl font-bold mb-4">Verification Logs</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full border">
-              <thead className="bg-gray-200">
+        <section>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            Verification Logs
+          </h2>
+
+          <div className="bg-white rounded-xl shadow overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
                 <tr>
-                  <th className="p-2 border">ID</th>
-                  <th className="p-2 border">Status</th>
-                  <th className="p-2 border">Time</th>
-                  <th className="p-2 border">Student</th>
+                  <th className="p-3 text-left">ID</th>
+                  <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left">Time</th>
+                  <th className="p-3 text-left">Student</th>
                 </tr>
               </thead>
               <tbody>
                 {logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-100">
-                    <td className="p-2 border">{log.id}</td>
-                    <td className="p-2 border">{log.status}</td>
-                    <td className="p-2 border">
+                  <tr
+                    key={log.id}
+                    className="border-t hover:bg-gray-50 transition"
+                  >
+                    <td className="p-3">{log.id}</td>
+                    <td className="p-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold text-white ${
+                          log.status === "VERIFIED"
+                            ? "bg-emerald-600"
+                            : log.status === "IMPERSONATION"
+                            ? "bg-red-600"
+                            : "bg-gray-400"
+                        }`}
+                      >
+                        {log.status}
+                      </span>
+                    </td>
+                    <td className="p-3">
                       {new Date(log.timestamp).toLocaleString()}
                     </td>
-                    <td className="p-2 border">{log.name}</td>
+                    <td className="p-3 font-medium">{log.name}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </>
+        </section>
       )}
 
       {/* ================= MODALS ================= */}
@@ -186,7 +199,7 @@ export default function Dashboard() {
         open={modalOpen}
         student={selectedStudent}
         logs={logs}
-        onClose={handleCloseModal}
+        onClose={() => setModalOpen(false)}
       />
 
       <AddStudentModal
@@ -194,6 +207,16 @@ export default function Dashboard() {
         onClose={() => setOpenAddModal(false)}
         onStudentAdded={fetchDashboardData}
       />
+    </div>
+  );
+}
+
+/* ================= REUSABLE STAT CARD ================= */
+function StatCard({ title, value, color }) {
+  return (
+    <div className={`${color} text-white p-5 rounded-xl shadow`}>
+      <div className="text-sm opacity-80">{title}</div>
+      <div className="text-3xl font-bold mt-2">{value}</div>
     </div>
   );
 }
