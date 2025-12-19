@@ -13,6 +13,7 @@ export default function Login() {
   });
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,6 +22,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       const res = await API.post("/admin/login", form);
@@ -28,9 +30,11 @@ export default function Login() {
         login(res.data.token);
         navigate("/");
       } else {
+        setLoading(false);
         setError(res.data.message);
       }
     } catch {
+      setLoading(false);
       setError("Invalid username or password");
     }
   };
@@ -93,10 +97,11 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full py-2.5 bg-blue-600 text-white font-medium 
-                       rounded-md hover:bg-blue-700 transition"
+            className="w-full py-2.5 bg-blue-600 text-white font-medium rounded-md 
+hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={loading}
           >
-            Sign in
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
