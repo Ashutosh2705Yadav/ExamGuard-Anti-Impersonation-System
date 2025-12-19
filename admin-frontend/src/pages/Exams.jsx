@@ -29,19 +29,19 @@ export default function Exams() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-900 p-6">
 
       {/* ================= TOP BAR ================= */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-2"
+            className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-white mb-2"
           >
             ← Back to Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-800">Exams</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-white">Exams</h1>
+          <p className="text-sm text-gray-400 mt-1">
             Create exams and manage assigned students
           </p>
         </div>
@@ -68,7 +68,7 @@ export default function Exams() {
 
       {/* ================= EMPTY STATE ================= */}
       {!loading && exams.length === 0 && (
-        <div className="bg-white rounded-xl shadow p-8 text-center text-gray-500">
+        <div className="bg-gray-800 rounded-xl shadow p-8 text-center text-gray-300">
           No exams created yet. Click <b>Create Exam</b> to get started.
         </div>
       )}
@@ -79,16 +79,16 @@ export default function Exams() {
           {exams.map((e) => (
             <div
               key={e.id}
-              className="bg-white rounded-xl shadow p-5 hover:shadow-md transition"
+              className="bg-gray-800 rounded-xl shadow p-5 hover:shadow-md transition"
             >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
                 {/* LEFT INFO */}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800">
+                  <h2 className="text-xl font-semibold text-white">
                     {e.exam_name}
                   </h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-gray-400 mt-1">
                     {new Date(e.exam_date).toLocaleDateString()} •{" "}
                     {e.start_time.slice(0, 5)} – {e.end_time.slice(0, 5)} •{" "}
                     {e.center}
@@ -119,7 +119,7 @@ export default function Exams() {
                     href={`${API.defaults.baseURL}/exams/${e.id}/hallticket`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200 transition"
+                    className="px-3 py-1.5 bg-gray-700 text-gray-200 rounded-md text-sm hover:bg-gray-600 transition"
                   >
                     Halltickets
                   </a>

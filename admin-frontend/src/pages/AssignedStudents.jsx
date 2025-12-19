@@ -24,29 +24,27 @@ export default function AssignedStudents() {
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Assigned Students</h1>
+    <div className="min-h-screen p-6 bg-gray-900 text-gray-100">
+      <h1 className="text-2xl font-bold mb-4 text-white">Assigned Students</h1>
 
-      {/* ✅ SPA-safe navigation */}
       <Link
         to="/exams"
-        className="px-3 py-1 bg-gray-200 rounded text-sm mb-4 inline-block"
+        className="inline-block px-3 py-1 bg-gray-800 text-gray-100 rounded text-sm hover:bg-gray-700"
       >
         ← Back to Exams
       </Link>
 
-      {/* SEARCH */}
       <input
         type="text"
         placeholder="Search by name, email or Aadhaar"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full md:w-1/3 px-3 py-2 border rounded mb-4"
+        className="block mt-4 w-full md:w-1/3 px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       <div className="space-y-4 mt-4">
         {students.length === 0 ? (
-          <div className="text-gray-500">No students assigned yet.</div>
+          <div className="text-gray-400">No students assigned yet.</div>
         ) : (
           students
             .filter((s) => {
@@ -60,13 +58,13 @@ export default function AssignedStudents() {
             .map((s) => (
               <div
                 key={s.id}
-                className="p-4 border rounded flex justify-between items-center"
+                className="p-4 border border-gray-700 rounded-lg flex justify-between items-center bg-gray-800 shadow"
               >
                 <div>
                   <div className="font-semibold">
                     {s.name} • {s.email}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-400">
                     Aadhaar: {s.aadhaar}
                   </div>
                   <div className="text-sm">

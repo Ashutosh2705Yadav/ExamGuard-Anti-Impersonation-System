@@ -36,7 +36,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-sm p-8">
 
         {/* HEADER */}
@@ -102,7 +102,7 @@ export default function Login() {
 
         {/* FOOTER */}
         <div className="mt-6 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} ExamGuard System
+          © {new Date().getFullYear()} ExamGuard System · Developed by Ashutosh Yadav
         </div>
       </div>
     </div>

@@ -113,23 +113,23 @@ export default function Verify() {
   };
 
   return (
-    <div className="p-6 flex justify-center">
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-6 flex justify-center">
       {/* BACK */}
       <button
         onClick={() => navigate("/")}
-        className="fixed top-4 left-4 px-4 py-2 bg-white border rounded-lg shadow hover:bg-gray-100 z-50"
+        className="fixed top-4 left-4 px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-lg shadow hover:bg-gray-700 z-50"
       >
         ← Dashboard
       </button>
 
       <div className="w-full max-w-2xl">
-        <h1 className="text-3xl font-bold mb-6 text-center">
+        <h1 className="text-3xl font-bold mb-6 text-center text-white">
           Verify Student Identity
         </h1>
 
         {/* SCANNER */}
         {!scanResult && (
-          <div className="bg-white shadow-lg rounded-xl p-6 border text-center">
+          <div className="bg-gray-800 shadow-xl rounded-xl p-6 border border-gray-700 text-center">
             <button
               onClick={startScanner}
               disabled={!cameraReady}
@@ -152,22 +152,22 @@ export default function Verify() {
 
         {/* RESULT */}
         {scanResult && (
-          <div className="mt-6 bg-white shadow-xl rounded-xl p-6 border">
-            <h2 className="text-xl font-semibold mb-3">Student Details</h2>
+          <div className="mt-6 bg-gray-800 shadow-xl rounded-xl p-6 border border-gray-700 text-gray-200">
+            <h2 className="text-xl font-semibold text-white mb-3">Student Details</h2>
 
             <p><b>Name:</b> {scanResult.student.name}</p>
             <p><b>Email:</b> {scanResult.student.email}</p>
             <p><b>Aadhaar:</b> {scanResult.student.aadhaar}</p>
 
-            <h2 className="text-xl font-semibold mt-4">Exam Details</h2>
+            <h2 className="text-xl font-semibold text-white mt-4">Exam Details</h2>
             <p><b>Exam:</b> {scanResult.exam.exam_name}</p>
             <p><b>Center:</b> {scanResult.exam.center}</p>
 
-            <h2 className="text-xl font-semibold mt-4">Hall Ticket QR</h2>
+            <h2 className="text-xl font-semibold text-white mt-4">Hall Ticket QR</h2>
             <div className="flex justify-center mt-2">
               <img
                 src={scanResult.hallticket}
-                className="w-48 border rounded"
+                className="w-48 border border-gray-600 rounded shadow"
                 alt="QR"
               />
             </div>

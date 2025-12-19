@@ -42,13 +42,13 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-6">
 
       {/* ================= HEADER ================= */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
+          <p className="text-sm text-gray-300 mt-1">
             Overview of students, exams & verifications
           </p>
         </div>
@@ -130,10 +130,10 @@ export default function Dashboard() {
       {/* ================= STUDENTS ================= */}
       {!loading && (
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-2xl font-semibold text-white mb-4">
             Registered Students
           </h2>
-          <div className="bg-white rounded-xl shadow p-4">
+          <div className="bg-white/95 rounded-xl shadow-lg p-4">
             <StudentsPanel
               students={students}
               onSelectStudent={(s) => {
@@ -148,13 +148,13 @@ export default function Dashboard() {
       {/* ================= LOGS ================= */}
       {!loading && (
         <section>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-2xl font-semibold text-white mb-4">
             Verification Logs
           </h2>
 
-          <div className="bg-white rounded-xl shadow overflow-x-auto">
+          <div className="bg-white/95 rounded-xl shadow-lg overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+              <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
                 <tr>
                   <th className="p-3 text-left">ID</th>
                   <th className="p-3 text-left">Status</th>
